@@ -20,11 +20,24 @@ public class Main {
 
 	@GET
 	@Produces("application/json")
-	public Response get(@QueryParam("nombre") String nombre, @QueryParam("peso") int peso) throws JSONException {
+	public Response get(
+			@QueryParam("nombre") String nombre,
+			@QueryParam("peso") Integer peso) throws JSONException {
 
 		MarvelHeroResponse response = new MarvelHeroResponse();
 
-		response.setHeroes(getHeroesList());
+		List<MarvelHero> filteredHeroes = new ArrayList<MarvelHero>();
+		
+		for( MarvelHero h : getHeroesList() ){
+			boolean include = true;
+			include = include && ( nombre == null || nombre.equals(h.getNombre()) );
+			include = include && ( peso   == null || peso == h.getPeso() );
+			
+			if ( include )
+				filteredHeroes.add(h);
+		}
+		
+		response.setHeroes(filteredHeroes);
 
 		return Response.status(200).entity(response).build();
 	}
